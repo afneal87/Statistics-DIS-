@@ -84,7 +84,7 @@ for (dim in 1:4) {
   plot_title <- paste('Contribution of Variables to Dimension', dim) 
   
   #create contribution plot for dimension 
-  p <- fviz_contrib(mca_model, choice = 'var', top = 93, axes = c(dim), gradient.cols = c('blue', 'white', 'red')) +
+  p <- fviz_contrib(mca_model, choice = 'var', top = 25, axes = c(dim), gradient.cols = c('blue', 'white', 'red')) +
     ggtitle(plot_title)
   
   #display plots 
@@ -92,3 +92,10 @@ for (dim in 1:4) {
 }
 
 # all dimensions have 90 or more "important variables" contributing to them 
+
+# each scale item consists of so many categories, it may be easier to 
+# interpret results if scales are binned into larger categories. 
+
+
+## Bin variables into larger groups for easier interpretability ---------------
+
