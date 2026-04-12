@@ -1,8 +1,11 @@
 # Packages ------------------------------------------------------------
+library(factoextra)
 library(haven) #read .sav files
 library(dplyr) #data cleaning and manipulation
 library(tidyverse) #data cleaning and manipulation
 library(sjlabelled) #get variable labels 
+library(psych) #descriptive statistics
+library(FactoMineR) #MCA function
 
 
 # Read in and clean data -------------------------------------------
@@ -36,7 +39,7 @@ study2_clean <- study2 %>%
     est_connect_1:est_connect_9, #self esteem scale 
     SMSdaily_active_1, #active social media use 
     SMSdaily_active_2,#passive social media use 
-    rel_understanding_1:rel_understanding_2, #relative understanding by relationship partner
+    rel_understanding_1:rel_understanding_5, #relative understanding by relationship partner
     SMS_plat_freq_1:SMS_plat_freq_10 #frequency of use of social media sites 
   )
 
@@ -45,5 +48,47 @@ study2_clean <- study2 %>%
 study2_clean <- study2_clean %>%
   mutate(SMS_freq_avg = rowMeans(pick(SMS_plat_freq_1:SMS_plat_freq_10), na.rm = TRUE))
 
+# MCA Analysis ----------------------------------------------------------------
+
+# isolate variables for MCA analysis 
+mca_predictors <- study2_clean %>% 
+  # select predictor variables 
+  select(p_age:rel_understanding_5) %>% 
+  #for every variable that is numberic, if the number of unique values 
+  #is less than 10, make it a factor 
+  mutate(across(where(is.numeric), 
+                ~ if(n_distinct(.) <=10) as.factor(.) else .)) %>% 
+  #select variables that are factors 
+  select_if(is.factor) %>%
+  # unsure what these lines do, ask Dr. Ghosh 
+  select_if(function(x) n_distinct(x) > 1) %>%
+  select_if(function(x) n_distinct(x) < 0.9 * nrow(study2_clean)) %>%
+  na.omit()
+
+## Build MCA model -------------------------------------------------
+
+mca_model <- MCA(mca_predictors, graph = TRUE)
+summary.MCA(mca_model)
+plot(mca_model, invisible = 'ind', selectMod = 'contrib20')
 
 
+## see variables contributing to dimensions --------------------
+
+# scree plot 
+fviz_screeplot(mca_model)
+# based on the scree plot, four dimensions are the most appropriate to
+# describe this data set 
+
+# see variable contributions for top four dimensions 
+for (dim in 1:4) {
+  plot_title <- paste('Contribution of Variables to Dimension', dim) 
+  
+  #create contribution plot for dimension 
+  p <- fviz_contrib(mca_model, choice = 'var', top = 93, axes = c(dim), gradient.cols = c('blue', 'white', 'red')) +
+    ggtitle(plot_title)
+  
+  #display plots 
+  print(p)
+}
+
+# all dimensions have 90 or more "important variables" contributing to them 
