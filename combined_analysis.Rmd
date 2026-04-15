@@ -1,0 +1,191 @@
+---
+title: "DIS Spring 2026"
+author: "AFN"
+date: "2026-04-15"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Packages and Data 
+
+```{r packages}
+library(factoextra)
+library(haven) #read .sav files
+library(dplyr) #data cleaning and manipulation
+library(tidyverse) #data cleaning and manipulation
+library(sjlabelled) #get variable labels 
+library(psych) #descriptive statistics
+library(FactoMineR) #MCA function
+library(paletteer) #color palette 'MoMAColors::Klein'
+library(caret) #training and testing sets 
+library(Metrics) #evaluate model metrics 
+library(rsm)
+```
+
+```{r load data}
+study2 <- read_sav('Data/Study2.sav')
+# add relationship length variable 
+study2 <- study2 %>%
+  mutate(rel_length = case_when(
+    # if relationship is less than one year, divid number of months by 12 for porportion of year
+    length_months_1 >=1 ~ length_months_1/12,
+    # if relationship is longer than one year, keep variable the same 
+    length_years_1 >= 1 ~ length_years_1))
+
+# create new dataframe with variables for analysis 
+study2_clean <- study2 %>%
+  select(
+    p_age, #participant age
+    p_gender, #participant gender
+    p_SES, #MacArthur subjective social status scale 
+    p_trans, #transgender identity (y/n)
+    p_race, #particpant race 
+    p_sexual_orientation, #participant sexual orientation
+    rel_distance, #relationship long distance (y/n)
+    rel_length, #relationship length in years 
+    SWLS_1:SWLS_5, #satisfaction with life scale
+    SMS_profiles, #number of individual social media profiles across all platforms
+    SMS_visibility_1:SMS_visibility_5, #relationship visibility on social media
+    IMS_daily_1:IMS_daily_6, #investment model scale satisfaction and commitment
+    pos_neg_affect_1:pos_neg_affect_6, #positive and negative affect scale
+    est_connect_1:est_connect_9, #self esteem scale 
+    SMSdaily_active_1, #active social media use 
+    SMSdaily_active_2,#passive social media use 
+    rel_understanding_1:rel_understanding_5, #relative understanding by relationship partner
+    SMS_plat_freq_1:SMS_plat_freq_10 #frequency of use of social media sites 
+  )
+
+# calculate social media frequency composite score based on the frequency 
+# of use across all 10 platforms in the survey 
+study2_clean <- study2_clean %>%
+  mutate(SMS_freq_avg = rowMeans(pick(SMS_plat_freq_1:SMS_plat_freq_10), na.rm = TRUE))
+
+# factor demographic variables 
+study2_clean <- study2_clean %>%
+  mutate(
+    p_gender = factor(p_gender, labels = c('Agender',
+                                           'Man',
+                                           'Woman',
+                                           'Non-binary')),
+    p_trans = factor(p_trans, labels = c('Transgender',
+                                         'Cisgender')),
+    p_sexual_orientation = factor(p_sexual_orientation, labels = c('Asexual',
+                                                                   'Bisexual',
+                                                                   'Heterosexual',
+                                                                   'Lesbian or Gay',
+                                                                   'Pansexual',
+                                                                   'Not listed')),
+    rel_distance = factor(rel_distance, labels = c('Long distance',
+                                                   'No long distance'))
+  )
+```
+
+# MCA Analysis 
+
+```{r mca dataset}
+# create composite scores from scales 
+study2_clean <- study2_clean %>%
+  mutate(
+    # satisfaction with life scale 
+    SWLS_avg = rowMeans(pick(SWLS_1:SWLS_5), na.rm = TRUE),
+    # online relationship visibility
+    SMS_visibility_4R = 8 - SMS_visibility_4,
+    SMS_visibility_avg = rowMeans(pick(SMS_visibility_1:SMS_visibility_3, SMS_visibility_4R, SMS_visibility_5), na.rm = TRUE),
+    # investment model scale satisfaction
+    IMS_sat = rowMeans(pick(IMS_daily_1:IMS_daily_3), na.rm = TRUE),
+    # investment model commitment scale 
+    IMS_com = rowMeans(pick(IMS_daily_4:IMS_daily_5), na.rm = TRUE),
+    # total investment model scale 
+    IMS_total = rowMeans(pick(IMS_daily_1:IMS_daily_6), na.rm = TRUE),
+    # positive affect total 
+    positive_affect = rowMeans(pick(pos_neg_affect_1:pos_neg_affect_3), na.rm = TRUE),
+    # negative affect total 
+    negative_affect = rowMeans(pick(pos_neg_affect_4:pos_neg_affect_6), na.rm = TRUE),
+    # self esteem
+    est_connect_1R = 8 - est_connect_1,
+    est_connect_4R = 8 - est_connect_4,
+    est_connect_5R = 8 - est_connect_5,
+    est_connect_8R = 8 - est_connect_5, 
+    esteem_avg = rowMeans(pick(est_connect_2, est_connect_3, est_connect_6, est_connect_7, est_connect_1R:est_connect_8R), na.rm = TRUE),
+    rel_understanding_avg = rowMeans(pick(rel_understanding_1:rel_understanding_5), na.rm = TRUE)
+  )
+
+#bin continuous variables into categories 
+study2_clean <- study2_clean %>%
+  mutate(
+    # satisfaction with life scale 
+    SWLS_bin = cut(SWLS_avg, breaks = c(0, 2.33, 4.66, 7), labels = c('low','mid','high')),
+    # online relationship visibility
+    SMS_visibility_bin = cut(SMS_visibility_avg, breaks = c(0, 2.33, 4.66, 7), labels = c('low','mid','high')),
+    # IMS satisfaction 
+    IMS_sat_bin = cut(IMS_sat, breaks = c(0, 3, 6, 9), labels = c('low','mid','high')),
+    # IMS commitment
+    IMS_com_bin = cut(IMS_sat, breaks = c(0, 3, 6, 9), labels = c('low','mid','high')),
+    #IMS total 
+    IMS_total_bin = cut(IMS_total, breaks = c(0, 3, 6, 9), labels = c('low','mid','high')),
+    # positive affect 
+    positive_affect_bin = cut(positive_affect, breaks = c(0, 2.33, 4.66, 7), labels = c('low','mid','high')),
+    # negative affect
+    negative_affect_bin = cut(negative_affect, breaks = c(0,2.33,4.66,7), labels = c('low','mid','high')),
+    #self esteem 
+    esteem_bin = cut(esteem_avg, breaks = c(0, 2.33, 4.66, 7), labels = c('low','mid','high')),
+    #relationship understanding
+    rel_understanding_bin = cut(rel_understanding_avg, breaks = c(0, 1.66, 3.33, 5), labels = c('low','mid','high'))
+  )
+
+#isolate variables of interest for MCA
+mca_bin_pred <- study2_clean %>%
+  select(
+    p_gender, #participant gender
+    p_trans, #participant trans identity (y/n)
+    p_sexual_orientation, #participant sexual orientation
+    rel_distance, #relationship long distance (y/n)
+    SWLS_bin, #satisfaction with life average 
+    SMS_visibility_bin, #online relationship visibility average
+    IMS_total_bin, #investment model composite score
+    positive_affect_bin, #positive affect/mood 
+    negative_affect_bin, #negative affect/mood 
+    esteem_bin, #self-esteem score 
+    rel_understanding_bin, #relationship understanding average 
+    SMS_freq_avg #SMS frequency variable
+  ) %>%
+  na.omit()
+```
+
+Assess the number of important dimensions with a Scree plot. 
+
+```{r mca model}
+mca_bin_model <- MCA(mca_bin_pred, 
+                     quanti.sup = 12, #do not use SMS frequency to build dimensions
+                     graph = FALSE)
+fviz_screeplot(mca_bin_model, 
+               barfill = '#7E1A2FFF',
+               barcolor = 'black') +
+  theme(text = element_text(family = 'serif'))
+```
+
+Based on the scree plot, 3 or 4 dimensions are appropriate to explain the variation in the data. 
+
+## MCA important variables 
+
+Using Biplots, we can assess which variables are of the highest importance for each dimension.
+
+### Dimensions 1 and 2
+
+```{r dim 1 and 2 variable importance}
+fviz_mca_var(mca_bin_model, choice = 'var', axes = c(1,2))
+```
+
+Variables further from the origin are more important to the dimensions. 
+
+The most important variables for dimensions 1 and 2 are: 
+* Investment model scale - Relationship quality
+* Relative understanding - Relationship quality 
+* Positive affect - overall quality of life
+* negative affect - overall quality of life
+* Satisfaction with life - subjective well-being
+* Self-esteem - overall quality of life 
+
