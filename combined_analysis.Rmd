@@ -2,7 +2,9 @@
 title: "DIS Spring 2026"
 author: "AFN"
 date: "2026-04-15"
-output: word_document
+output: 
+  word_document: 
+    keep_md: true
 ---
 
 ```{r setup, include=FALSE}
@@ -175,8 +177,9 @@ Using Biplots, we can assess which variables are of the highest importance for e
 
 ### Dimensions 1 and 2
 
-```{r dim 1 and 2 variable importance}
-fviz_mca_var(mca_bin_model, choice = 'var', axes = c(1,2))
+```{r dim 1 and 2 variable importance, dpi=300}
+fviz_mca_var(mca_bin_model, choice = 'var', axes = c(1,2),
+             font.family = 'serif', col.var = '#FF4D6FFF', col.quanti.sup = '#579EA4FF')
 ```
 
 Variables further from the origin are more important to the dimensions. 
@@ -189,3 +192,30 @@ The most important variables for dimensions 1 and 2 are:
 * Satisfaction with life - subjective well-being
 * Self-esteem - overall quality of life 
 
+Taken together, these dimensions appear to clump together participants based on their subjective quality of life measures such as relationship quality and well-being. Based on this, we expect participants who report feeling low subjective well-being to also report lower relationship quality. 
+
+### Dimensions 3 and 4
+```{r dim 3 and 4 variable importance, dpi=300}
+fviz_mca_var(mca_bin_model, choice = 'var', axes = c(3,4),
+             font.family = 'serif', col.var = '#FF4D6FFF', col.quanti.sup = '#579EA4FF')
+```
+
+The variables participant gender and participant sexual orientation are important to dimension 3 and 4. The variable relationship long distance is important to dimension 4 but not dimension 3. Participant transgender identity is important to dimension 3 but not 4. 
+
+These dimensions are based on gender and sexual orientation. Based on these dimensions, we would expect to see categories of people based on their minority gender and sexuality status. 
+
+## Individual Participants 
+
+We can visualize each participant's score on dimensions based on the categories of our important variables. 
+
+### Dimensions 1 and 2
+
+```{r ind plot dims 1 and 2 IMS, dpi=300}
+fviz_mca_ind(mca_bin_model,
+             label = 'none',
+             habillage = 'IMS_total_bin',
+             addEllipses = TRUE, ellipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(1,2)) +
+  scale_color_paletteer_d('MoMAColors::Klein')
+```
