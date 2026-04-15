@@ -9,10 +9,6 @@ library(FactoMineR) #MCA function
 library(paletteer) #color palette 'MoMAColors::Klein'
 
 
-# LAST LEFT OFF: composite score of positive and negative affect line 144
-# reverse code negative items and take composite 
-
-
 # Read in and clean data -------------------------------------------
 
 study2 <- read_sav('Data/Study2.sav')
@@ -141,8 +137,6 @@ study2_clean <- study2_clean %>%
     positive_affect = rowMeans(pick(pos_neg_affect_1:pos_neg_affect_3), na.rm = TRUE),
     # negative affect total 
     negative_affect = rowMeans(pick(pos_neg_affect_4:pos_neg_affect_6), na.rm = TRUE),
-    #total affect, high = positive 
-    pos_neg_affect_4R = 
     # self esteem
     est_connect_1R = 8 - est_connect_1,
     est_connect_4R = 8 - est_connect_4,
@@ -177,6 +171,8 @@ study2_clean <- study2_clean %>%
 
 #correlation between IMS satisfaction and commitment scores 
 cor(study2_clean$IMS_sat, study2_clean$IMS_com) # r = .80 
+#correlation between positive and negative affect 
+cor(study2_clean$positive_affect, study2_clean$negative_affect) #r = -0.29
 
 #visual representation of bin distributions 
 plot(study2_clean$SWLS_bin) #majority of respondents in bin 2
@@ -202,13 +198,14 @@ mca_bin_pred <- study2_clean %>%
     positive_affect_bin, #positive affect/mood 
     negative_affect_bin, #negative affect/mood 
     esteem_bin, #self-esteem score 
-    rel_understanding_bin #relationship understanding average 
+    rel_understanding_bin, #relationship understanding average 
+    SMS_freq_avg #SMS frequency variable
   ) %>%
   na.omit()
 
 ### build MCA model with new predictor variables -------------------------
 
-mca_bin_model <- MCA(mca_bin_pred, graph = TRUE)
+mca_bin_model <- MCA(mca_bin_pred, quanti.sup = 12, graph = TRUE)
 summary(mca_bin_model, nbelements = Inf)
 fviz_mca_var(mca_bin_model)
 
