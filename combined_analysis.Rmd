@@ -1,4 +1,19 @@
-# Packages ------------------------------------------------------------
+---
+title: "DIS Spring 2026"
+author: "AFN"
+date: "2026-04-15"
+output: 
+  word_document: 
+    keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Packages and Data 
+
+```{r packages}
 library(factoextra)
 library(haven) #read .sav files
 library(dplyr) #data cleaning and manipulation
@@ -7,13 +22,14 @@ library(sjlabelled) #get variable labels
 library(psych) #descriptive statistics
 library(FactoMineR) #MCA function
 library(paletteer) #color palette 'MoMAColors::Klein'
+library(caret) #training and testing sets 
+library(Metrics) #evaluate model metrics 
+library(rsm)
+```
 
-
-# Read in and clean data -------------------------------------------
-
+```{r load data}
 study2 <- read_sav('Data/Study2.sav')
-
-# create relationship length variable 
+# add relationship length variable 
 study2 <- study2 %>%
   mutate(rel_length = case_when(
     # if relationship is less than one year, divid number of months by 12 for porportion of year
@@ -49,7 +65,7 @@ study2_clean <- study2 %>%
 study2_clean <- study2_clean %>%
   mutate(SMS_freq_avg = rowMeans(pick(SMS_plat_freq_1:SMS_plat_freq_10), na.rm = TRUE))
 
-#factor demographic variables 
+# factor demographic variables 
 study2_clean <- study2_clean %>%
   mutate(
     p_gender = factor(p_gender, labels = c('Agender',
@@ -67,59 +83,11 @@ study2_clean <- study2_clean %>%
     rel_distance = factor(rel_distance, labels = c('Long distance',
                                                    'No long distance'))
   )
+```
 
+# MCA Analysis 
 
-# MCA Analysis ----------------------------------------------------------------
-
-# isolate variables for MCA analysis 
-mca_predictors <- study2_clean %>% 
-  # select predictor variables 
-  select(p_age:rel_understanding_5) %>% 
-  #for every variable that is numberic, if the number of unique values 
-  #is less than 10, make it a factor 
-  mutate(across(where(is.numeric), 
-                ~ if(n_distinct(.) <=10) as.factor(.) else .)) %>% 
-  #select variables that are factors 
-  select_if(is.factor) %>%
-  # unsure what these lines do, ask Dr. Ghosh 
-  select_if(function(x) n_distinct(x) > 1) %>%
-  select_if(function(x) n_distinct(x) < 0.9 * nrow(study2_clean)) %>%
-  na.omit()
-
-## Build MCA model -------------------------------------------------
-
-mca_model <- MCA(mca_predictors, graph = TRUE)
-summary.MCA(mca_model)
-plot(mca_model, invisible = 'ind', selectMod = 'contrib20')
-
-
-## see variables contributing to dimensions --------------------
-
-# scree plot 
-fviz_screeplot(mca_model)
-# based on the scree plot, four dimensions are the most appropriate to
-# describe this data set 
-
-# see variable contributions for top four dimensions 
-for (dim in 1:4) {
-  plot_title <- paste('Contribution of Variables to Dimension', dim) 
-  
-  #create contribution plot for dimension 
-  p <- fviz_contrib(mca_model, choice = 'var', top = 25, axes = c(dim), gradient.cols = c('blue', 'white', 'red')) +
-    ggtitle(plot_title)
-  
-  #display plots 
-  print(p)
-}
-
-# all dimensions have 90 or more "important variables" contributing to them 
-
-# each scale item consists of so many categories, it may be easier to 
-# interpret results if scales are binned into larger categories. 
-
-
-## Bin variables into larger groups for easier interpretability ---------------
-
+```{r mca dataset}
 # create composite scores from scales 
 study2_clean <- study2_clean %>%
   mutate(
@@ -147,8 +115,6 @@ study2_clean <- study2_clean %>%
     rel_understanding_avg = rowMeans(pick(rel_understanding_1:rel_understanding_5), na.rm = TRUE)
   )
 
-hist(study2_clean$IMS_sat)
-
 #bin continuous variables into categories 
 study2_clean <- study2_clean %>%
   mutate(
@@ -172,23 +138,7 @@ study2_clean <- study2_clean %>%
     rel_understanding_bin = cut(rel_understanding_avg, breaks = c(0, 1.66, 3.33, 5), labels = c('low','mid','high'))
   )
 
-#correlation between IMS satisfaction and commitment scores 
-cor(study2_clean$IMS_sat, study2_clean$IMS_com) # r = .80 
-#correlation between positive and negative affect 
-cor(study2_clean$positive_affect, study2_clean$negative_affect) #r = -0.29
-
-#visual representation of bin distributions 
-plot(study2_clean$SWLS_bin) #majority of respondents in bin 2
-plot(study2_clean$SMS_visibility_bin) #majority of respondents in bin 2
-plot(study2_clean$IMS_sat_bin) #majority of respondents in bin 3
-plot(study2_clean$IMS_com_bin) #majority of respondents in bin 3
-plot(study2_clean$IMS_total_bin) #majority of respondents in bin 3
-plot(study2_clean$positive_affect_bin) #majority of respondents in bin 2
-plot(study2_clean$negative_affect_bin) #majority of respondents in bin 2, higher proportion in bin 1
-plot(study2_clean$esteem_bin) #majority of respondents in bins 2 and 3
-plot(study2_clean$rel_understanding_bin) #majority of respondents in bin 3
-
-# isolate variables of interest for binning model 
+#isolate variables of interest for MCA
 mca_bin_pred <- study2_clean %>%
   select(
     p_gender, #participant gender
@@ -205,51 +155,62 @@ mca_bin_pred <- study2_clean %>%
     SMS_freq_avg #SMS frequency variable
   ) %>%
   na.omit()
+```
 
-### build MCA model with new predictor variables -------------------------
+Assess the number of important dimensions with a Scree plot. 
 
-mca_bin_model <- MCA(mca_bin_pred, quanti.sup = 12, graph = TRUE)
-summary(mca_bin_model, nbelements = Inf)
-fviz_mca_var(mca_bin_model)
+```{r mca model}
+mca_bin_model <- MCA(mca_bin_pred, 
+                     quanti.sup = 12, #do not use SMS frequency to build dimensions
+                     graph = FALSE)
+fviz_screeplot(mca_bin_model, 
+               barfill = '#7E1A2FFF',
+               barcolor = 'black') +
+  theme(text = element_text(family = 'serif'))
+```
 
-# scree plot of dimensions 
-fviz_screeplot(mca_bin_model)
-# higher percentage of variance explained by binned variables than original variables 
-# scree plot suggests 3 or 4 dimensions are appropriate 
-# model with IMS composite score suggests 3 dimensions are appropriate 
+Based on the scree plot, 3 or 4 dimensions are appropriate to explain the variation in the data. 
 
-# see variable contributions for top 4 dimensions 
-for (dim in 1:4) {
-  plot_title <- paste('Contribution of Variables to Dimension', dim) 
-  
-  #create contribution plot for dimension 
-  p <- fviz_contrib(mca_bin_model, choice = 'var', top = 20, axes = c(dim), gradient.cols = c('blue', 'white', 'red')) +
-    ggtitle(plot_title)
-  
-  #display plots 
-  print(p)
-}
+## MCA important variables 
 
-# additional visualizations 
+Using Biplots, we can assess which variables are of the highest importance for each dimension.
 
-fviz_mca_ind(mca_bin_model,
-             label = 'none',
-             habillage = 'p_gender',
-             addEllipses = TRUE, ellipse.type = 'confidence',
-             ggtheme = theme_minimal(),
-             axes = c(3,4)) +
-  scale_color_paletteer_d('MoMAColors::Klein')
-#ellipse shows confidence intervals. If ellipses do not overlap, groups are significantly different
+### Dimensions 1 and 2
 
+```{r dim 1 and 2 variable importance, dpi=300}
+fviz_mca_var(mca_bin_model, choice = 'var', axes = c(1,2),
+             font.family = 'serif', col.var = '#FF4D6FFF', col.quanti.sup = '#579EA4FF')
+```
 
-dimdesc(mca_bin_model, axes = c(1:4))
+Variables further from the origin are more important to the dimensions. 
 
-#variable importance dimensions 1 and 2
-fviz_mca_var(mca_bin_model, choice = 'var', axes = c(1,2))
-# most important variables are ims score, positive affect, relationship understanding, 
-# satisfaction with life, self esteem, and positive affect 
+The most important variables for dimensions 1 and 2 are: 
+* Investment model scale - Relationship quality
+* Relative understanding - Relationship quality 
+* Positive affect - overall quality of life
+* negative affect - overall quality of life
+* Satisfaction with life - subjective well-being
+* Self-esteem - overall quality of life 
 
-#individuals dimensions 1 and 2
+Taken together, these dimensions appear to clump together participants based on their subjective quality of life measures such as relationship quality and well-being. Based on this, we expect participants who report feeling low subjective well-being to also report lower relationship quality. 
+
+### Dimensions 3 and 4
+```{r dim 3 and 4 variable importance, dpi=300}
+fviz_mca_var(mca_bin_model, choice = 'var', axes = c(3,4),
+             font.family = 'serif', col.var = '#FF4D6FFF', col.quanti.sup = '#579EA4FF')
+```
+
+The variables participant gender and participant sexual orientation are important to dimension 3 and 4. The variable relationship long distance is important to dimension 4 but not dimension 3. Participant transgender identity is important to dimension 3 but not 4. 
+
+These dimensions are based on gender and sexual orientation. Based on these dimensions, we would expect to see categories of people based on their minority gender and sexuality status. 
+
+## Individual Participants 
+
+We can visualize each participant's score on dimensions based on the categories of our important variables. 
+
+### Dimensions 1 and 2
+
+```{r ind plot dims 1 and 2 IMS, dpi=300}
 fviz_mca_ind(mca_bin_model,
              label = 'none',
              habillage = 'IMS_total_bin',
@@ -257,23 +218,11 @@ fviz_mca_ind(mca_bin_model,
              ggtheme = theme_minimal(),
              axes = c(1,2)) +
   scale_color_paletteer_d('MoMAColors::Klein')
+```
 
-fviz_mca_ind(mca_bin_model,
-             label = 'none',
-             habillage = 'esteem_bin',
-             addEllipses = TRUE, ellipse.type = 'confidence',
-             ggtheme = theme_minimal(),
-             axes = c(1,2)) +
-  scale_color_paletteer_d('MoMAColors::Klein')
+Participants reporting low relationship satisfaction score significantly higher than 0 on both dimensions 1 and 2 compared to those in the middle and high categories. Those in the middle category score significantly lower than 0 on dimension 1 and higher than 0 on dimension 2. Those in the high relationship quality category score closer to the origin on both dimensions. 
 
-fviz_mca_ind(mca_bin_model,
-             label = 'none',
-             habillage = 'SWLS_bin',
-             addEllipses = TRUE, ellipse.type = 'confidence',
-             ggtheme = theme_minimal(),
-             axes = c(1,2)) +
-  scale_color_paletteer_d('MoMAColors::Klein')
-
+```{r relative understanding, dpi=300}
 fviz_mca_ind(mca_bin_model,
              label = 'none',
              habillage = 'rel_understanding_bin',
@@ -281,7 +230,35 @@ fviz_mca_ind(mca_bin_model,
              ggtheme = theme_minimal(),
              axes = c(1,2)) +
   scale_color_paletteer_d('MoMAColors::Klein')
+```
 
+Those in the low relative understanding category score significantly higher than 0 in dimensions 1 and 2. Those in the middle category score higher than 0 on dimension 1 and lower than 0 on dimension 2. Those in the high category cluster closer to the origin of both dimensions. 
+
+```{r positive affect, dpi=300}
+fviz_mca_ind(mca_bin_model,
+             label = 'none',
+             habillage = 'positive_affect_bin',
+             addEllipses = TRUE, ellipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(1,2)) +
+  scale_color_paletteer_d('MoMAColors::Klein')
+```
+
+Those in the low affect category score above 0 on both dimensions, whereas those in the middle and high categories cluster closer to the origin of both dimensions. 
+
+```{r SWLS, dpi=300}
+fviz_mca_ind(mca_bin_model,
+             label = 'none',
+             habillage = 'SWLS_bin',
+             addEllipses = TRUE, ellipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(1,2)) +
+  scale_color_paletteer_d('MoMAColors::Klein')
+```
+
+Those reporting low satisfaction with life have an average score above 0 for both dimensions. Those in the middle and high categories cluster closer to the origin of both dimensions, but there is more variability in those reporting middle satisfaction with life than those reporting high. 
+
+```{r negative affect, dpi=300}
 fviz_mca_ind(mca_bin_model,
              label = 'none',
              habillage = 'negative_affect_bin',
@@ -289,15 +266,6 @@ fviz_mca_ind(mca_bin_model,
              ggtheme = theme_minimal(),
              axes = c(1,2)) +
   scale_color_paletteer_d('MoMAColors::Klein')
+```
 
-#variable importance dimensions 2 and 3
-fviz_mca_var(mca_bin_model, choice = 'var', axes = c(2,3))
-#no overlap in important variables 
-
-#variable importance dimensions 1 and 3
-fviz_mca_var(mca_bin_model, choice = 'var', axes = c(1,3))
-# no overlap in important variables 
-
-#variable importance dimensions 3 and 4
-fviz_mca_var(mca_bin_model, choice = 'var', axes = c(3,4))
-# overlapping variables are gender and sexual orientation
+Those with high negative affect score above 0 on both dimensions. Those in the middle category average close to the origin of both dimensions but exhibit higher variability than those in the low category. 
