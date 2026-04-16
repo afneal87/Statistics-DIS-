@@ -269,3 +269,5 @@ fviz_mca_ind(mca_bin_model,
 ```
 
 Those with high negative affect score above 0 on both dimensions. Those in the middle category average close to the origin of both dimensions but exhibit higher variability than those in the low category. 
+
+making another change for commit
