@@ -101,3 +101,22 @@ pred.esteem <- predict(glm.model.3, glm.test)
 
 eval_metrics(glm.test$esteem_avg, pred.esteem)
 #way better prediction 
+
+## glm with 4 dimensions 
+glm.model.4 <- glm(esteem_avg ~ dim.1 + dim.2 + dim.3 + dim.4,
+                   data = glm.train, 
+                   family = gaussian())
+summary(glm.model.4)
+
+# test whether this model is significant improvement over previous model
+pchisq(q = 588.2 - 576.89,
+       df = 723 - 722,
+       lower.tail = FALSE)
+#p-value significant, model is improvement over previous 
+
+# make predictions with new model 
+pred.esteem.2 <- predict(glm.model.4, glm.test)
+
+# evaluate new model 
+eval_metrics(glm.test$esteem_avg, pred.esteem.2)
+# metrics are slightly worse than previous model, but not by much 
