@@ -4,7 +4,7 @@ library(Metrics) #evaluate model metrics
 library(rsm)
 library(factoextra)
 
-# GLM model -------------------------------------------------
+# GLM model to predict social media frequency -------------------------------------------------
 
 # add dimensions to mca dataframe 
 mca_bin_pred <- mca_bin_pred %>%
@@ -67,3 +67,37 @@ model.2 <- glm(SMS_freq_avg ~ dim.1 + dim.2 + dim.3,
 summary(model.2)
 
 # run model metrics 
+eval_metrics(glm.test$SMS_freq_avg, pred_glm)
+#dropping dimension 4 does not improve the metrics of the model 
+
+# GLM to predict self-esteem with new dimensions ------------------------------
+
+# add dimensions to dataframe 
+mca_pred_esteem <- mca_pred_esteem %>%
+  mutate(dim.1 = mca_model.3$ind$coord[,1],
+         dim.2 = mca_model.3$ind$coord[,2],
+         dim.3 = mca_model.3$ind$coord[,3],
+         dim.4 = mca_model.3$ind$coord[,4])
+
+# split training and testing sets 
+train_idx <- createDataPartition(mca_pred_esteem$esteem_avg, p = 0.8, list = FALSE)
+
+glm.train <- mca_pred_esteem[train_idx,] #training data 
+glm.test <- mca_pred_esteem[-train_idx,] #testing data 
+
+# build GLM model 
+glm.model.3 <- glm(esteem_avg ~ dim.1 + dim.2 + dim.3,
+                   data = glm.train,
+                   family = gaussian())
+summary(glm.model.3)
+
+pchisq(q = 1017.3-588.2, 
+       df = 726 - 723,
+       lower.tail = FALSE)
+#significant p-value, new model is improvement over null model 
+
+# make predictions with new model 
+pred.esteem <- predict(glm.model.3, glm.test)
+
+eval_metrics(glm.test$esteem_avg, pred.esteem)
+#way better prediction 

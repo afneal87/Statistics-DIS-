@@ -301,3 +301,45 @@ fviz_mca_var(mca_bin_model, choice = 'var', axes = c(1,3))
 #variable importance dimensions 3 and 4
 fviz_mca_var(mca_bin_model, choice = 'var', axes = c(3,4))
 # overlapping variables are gender and sexual orientation
+
+# MCA Model to predict relationship satisfaction -------------------------------
+
+mca_pred_esteem <- study2_clean %>%
+  select(
+    p_gender, #participant gender
+    p_trans, #participant trans identity (y/n)
+    p_sexual_orientation, #participant sexual orientation
+    rel_distance, #relationship long distance (y/n)
+    SWLS_bin, #satisfaction with life average 
+    SMS_visibility_bin, #online relationship visibility average
+    IMS_total_bin, #investment model composite score
+    positive_affect_bin, #positive affect/mood 
+    negative_affect_bin, #negative affect/mood 
+    rel_understanding_bin, #relationship understanding average 
+    esteem_avg #self-esteem average 
+  ) %>%
+  na.omit()
+
+## build MCA model --------------------------------------------------
+
+mca_model.3 <- MCA(mca_pred_esteem, quanti.sup = 11, graph = TRUE)
+fviz_screeplot(mca_model.3)
+#scree plot suggests 3 dimensions explain significant variation in data 
+
+# see variable importance for first 2 dimensions
+fviz_mca_var(mca_model.3, choice = 'var', axes = c(1,2))
+#same variable importance as previous model but without self esteem categories 
+
+# see variable importance for dimensions 3 and 4 
+fviz_mca_var(mca_model.3, choice = 'var', axes = c(3,4))
+#same variable importance as previous model
+
+#see individuals in dimensions 1 and 2
+fviz_mca_ind(mca_model.3,
+             label = 'none',
+             habillage = 'IMS_total_bin',
+             addEllipses = TRUE, ellipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(1,2)) +
+  scale_color_paletteer_d('MoMAColors::Klein')
+#same spread of individuals as previously 
