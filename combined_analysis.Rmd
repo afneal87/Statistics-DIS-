@@ -220,6 +220,8 @@ fviz_mca_ind(mca_bin_model,
   scale_color_paletteer_d('MoMAColors::Klein')
 ```
 
+Participants reporting low relationship satisfaction score significantly higher than 0 on both dimensions 1 and 2 compared to those in the middle and high categories. Those in the middle category score significantly lower than 0 on dimension 1 and higher than 0 on dimension 2. Those in the high relationship quality category score closer to the origin on both dimensions. 
+
 ```{r relative understanding, dpi=300}
 fviz_mca_ind(mca_bin_model,
              label = 'none',
@@ -230,4 +232,40 @@ fviz_mca_ind(mca_bin_model,
   scale_color_paletteer_d('MoMAColors::Klein')
 ```
 
-making another change for commit 
+Those in the low relative understanding category score significantly higher than 0 in dimensions 1 and 2. Those in the middle category score higher than 0 on dimension 1 and lower than 0 on dimension 2. Those in the high category cluster closer to the origin of both dimensions. 
+
+```{r positive affect, dpi=300}
+fviz_mca_ind(mca_bin_model,
+             label = 'none',
+             habillage = 'positive_affect_bin',
+             addEllipses = TRUE, ellipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(1,2)) +
+  scale_color_paletteer_d('MoMAColors::Klein')
+```
+
+Those in the low affect category score above 0 on both dimensions, whereas those in the middle and high categories cluster closer to the origin of both dimensions. 
+
+```{r SWLS, dpi=300}
+fviz_mca_ind(mca_bin_model,
+             label = 'none',
+             habillage = 'SWLS_bin',
+             addEllipses = TRUE, ellipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(1,2)) +
+  scale_color_paletteer_d('MoMAColors::Klein')
+```
+
+Those reporting low satisfaction with life have an average score above 0 for both dimensions. Those in the middle and high categories cluster closer to the origin of both dimensions, but there is more variability in those reporting middle satisfaction with life than those reporting high. 
+
+```{r negative affect, dpi=300}
+fviz_mca_ind(mca_bin_model,
+             label = 'none',
+             habillage = 'negative_affect_bin',
+             addEllipses = TRUE, ellipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(1,2)) +
+  scale_color_paletteer_d('MoMAColors::Klein')
+```
+
+Those with high negative affect score above 0 on both dimensions. Those in the middle category average close to the origin of both dimensions but exhibit higher variability than those in the low category. 

@@ -13,6 +13,13 @@ mca_bin_pred <- mca_bin_pred %>%
          dim.3 = mca_bin_model$ind$coord[,3],
          dim.4 = mca_bin_model$ind$coord[,4])
 
+par(mfrow=c(2,2))
+hist(mca_bin_pred$dim.1)
+hist(mca_bin_pred$dim.2)
+hist(mca_bin_pred$dim.3)
+hist(mca_bin_pred$dim.4)
+dev.off()
+
 ## train test split of dataset ------------------------------
 set.seed(1234)
 train_idx <- createDataPartition(mca_bin_pred$SMS_freq_avg, p = 0.8, list = FALSE)
@@ -50,3 +57,13 @@ print(glm.perf)
 # MAE = 1.127
 # R2 = 0.03
 # not good metrics? 
+
+# check for improvement by adding variables 
+# try dropping dim 4 due to low contribution
+
+model.2 <- glm(SMS_freq_avg ~ dim.1 + dim.2 + dim.3,
+               data = glm.train,
+               family = gaussian())
+summary(model.2)
+
+# run model metrics 

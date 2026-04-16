@@ -68,6 +68,7 @@ study2_clean <- study2_clean %>%
                                                    'No long distance'))
   )
 
+
 # MCA Analysis ----------------------------------------------------------------
 
 # isolate variables for MCA analysis 
@@ -145,6 +146,8 @@ study2_clean <- study2_clean %>%
     esteem_avg = rowMeans(pick(est_connect_2, est_connect_3, est_connect_6, est_connect_7, est_connect_1R:est_connect_8R), na.rm = TRUE),
     rel_understanding_avg = rowMeans(pick(rel_understanding_1:rel_understanding_5), na.rm = TRUE)
   )
+
+hist(study2_clean$IMS_sat)
 
 #bin continuous variables into categories 
 study2_clean <- study2_clean %>%
