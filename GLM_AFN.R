@@ -134,6 +134,7 @@ esteem_by_rq <- study2_clean %>%
 ggplot(data = mca_pred_esteem,
        aes(x = esteem_avg)) +
   geom_density(aes(fill = IMS_total_bin), alpha = .7) +
+  geom_vline(aes(xintercept = mean(esteem_avg)), linetype = 'dashed') +
   theme_classic() +
   theme(text = element_text(family = 'serif')) +
   scale_fill_paletteer_d('MoMAColors::Klein')
@@ -145,6 +146,7 @@ describeBy(study2_clean$IMS_total, study2_clean$IMS_total_bin)
 ggplot(data = mca_pred_esteem,
        aes(x = esteem_avg)) +
   geom_density(aes(fill = SWLS_bin), alpha = .7) +
+  geom_vline(aes(xintercept = mean(esteem_avg)), linetype = 'dashed') +
   theme_classic() +
   theme(text = element_text(family = 'serif')) +
   scale_fill_paletteer_d('MoMAColors::Klein')
@@ -155,6 +157,7 @@ ggplot(data = mca_pred_esteem,
 ggplot(data = mca_pred_esteem,
        aes(x = esteem_avg)) +
   geom_density(aes(fill = positive_affect_bin), alpha = .7) +
+  geom_vline(aes(xintercept = mean(esteem_avg)), linetype = 'dashed') +
   theme_classic() +
   theme(text = element_text(family = 'serif')) +
   scale_fill_paletteer_d('MoMAColors::Klein')
@@ -164,6 +167,7 @@ ggplot(data = mca_pred_esteem,
 ggplot(data = mca_pred_esteem,
        aes(x = esteem_avg)) +
   geom_density(aes(fill = negative_affect_bin), alpha = .7) +
+  geom_vline(aes(xintercept = mean(esteem_avg)), linetype = 'dashed') +
   theme_classic() +
   theme(text = element_text(family = 'serif')) +
   scale_fill_paletteer_d('MoMAColors::Klein')
@@ -173,6 +177,7 @@ ggplot(data = mca_pred_esteem,
 ggplot(data = mca_pred_esteem,
        aes(x = esteem_avg)) +
   geom_density(aes(fill = rel_understanding_bin), alpha = .7) +
+  geom_vline(aes(xintercept = mean(esteem_avg)), linetype = 'dashed') +
   theme_classic() +
   theme(text = element_text(family = 'serif')) +
   scale_fill_paletteer_d('MoMAColors::Klein')
@@ -182,6 +187,7 @@ ggplot(data = mca_pred_esteem,
 ggplot(data = mca_pred_esteem,
        aes(x = esteem_avg)) +
   geom_density(aes(fill = p_gender), alpha = .7) +
+  geom_vline(aes(xintercept = mean(esteem_avg)), linetype = 'dashed') +
   theme_classic() +
   theme(text = element_text(family = 'serif')) +
   scale_fill_paletteer_d('MoMAColors::Klein')
@@ -195,3 +201,49 @@ ggplot(data = mca_pred_esteem,
   theme_classic() +
   theme(text = element_text(family = 'serif')) +
   scale_fill_paletteer_d('MoMAColors::Klein')
+
+## self-esteem by transgender identity ------------------------------------
+
+ggplot(data = mca_pred_esteem,
+       aes(x = esteem_avg)) +
+  geom_density(aes(fill = p_trans), alpha = .7) +
+  geom_vline(aes(xintercept = mean(esteem_avg)), linetype = 'dashed') +
+  theme_classic() +
+  theme(text = element_text(family = 'serif')) +
+  scale_fill_paletteer_d('MoMAColors::Klein')
+
+## self-esteem and dimension 1 ------------------------------------
+
+ggplot(data = mca_pred_esteem,
+       aes(x = dim.1, y = esteem_avg)) +
+  geom_point(aes(color = dim.1)) +
+  theme_classic() +
+  theme(text = element_text(family = 'serif')) +
+  scale_color_gradient(low = '#FF4D6FFF', high = '#579EA4FF')
+
+## self-esteem and dimension 2 --------------------------------------------
+
+ggplot(data = mca_pred_esteem,
+       aes(x = dim.2, y = esteem_avg)) +
+  geom_point(aes(color = dim.2)) +
+  theme_classic() +
+  theme(text = element_text(family = 'serif')) +
+  scale_color_gradient(low = '#FF4D6FFF', high = '#579EA4FF')
+
+## self-esteem and dimension 3 ----------------------------------------
+
+ggplot(data = mca_pred_esteem,
+       aes(x = esteem_avg, y = dim.3)) +
+  geom_point(aes(color = dim.3)) +
+  theme_classic() +
+  theme(text = element_text(family = 'serif')) +
+  scale_color_gradient(low = '#FF4D6FFF', high = '#579EA4FF')
+
+## self-esteem and dimension 4 -----------------------------------------
+
+ggplot(data = mca_pred_esteem,
+       aes(x = dim.4, y = esteem_avg)) +
+  geom_point(aes(color = dim.4)) +
+  theme_classic() +
+  theme(text = element_text(family = 'serif')) +
+  scale_color_gradient(low = '#FF4D6FFF', high = '#579EA4FF')
