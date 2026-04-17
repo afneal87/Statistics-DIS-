@@ -2,7 +2,7 @@
 library(caret) #training and testing sets 
 library(Metrics) #evaluate model metrics 
 library(rsm)
-library(factoextra)
+library(ggridges)
 
 # GLM model to predict social media frequency -------------------------------------------------
 
@@ -119,4 +119,79 @@ pred.esteem.2 <- predict(glm.model.4, glm.test)
 
 # evaluate new model 
 eval_metrics(glm.test$esteem_avg, pred.esteem.2)
-# metrics are slightly worse than previous model, but not by much 
+# metrics are slightly worse than previous model, but not by much
+
+# visualizations -----------------------------------------------
+
+## self-esteem by relationship quality ---------------------------
+
+# dataframe of average relationship quality by IMS bin 
+esteem_by_rq <- study2_clean %>%
+  group_by(IMS_total_bin) %>%
+  summarize(esteem_group = mean(esteem_avg))
+
+
+ggplot(data = mca_pred_esteem,
+       aes(x = esteem_avg)) +
+  geom_density(aes(fill = IMS_total_bin), alpha = .7) +
+  theme_classic() +
+  theme(text = element_text(family = 'serif')) +
+  scale_fill_paletteer_d('MoMAColors::Klein')
+
+describeBy(study2_clean$IMS_total, study2_clean$IMS_total_bin)
+
+## self-esteem by satisfaction with life --------------------------
+
+ggplot(data = mca_pred_esteem,
+       aes(x = esteem_avg)) +
+  geom_density(aes(fill = SWLS_bin), alpha = .7) +
+  theme_classic() +
+  theme(text = element_text(family = 'serif')) +
+  scale_fill_paletteer_d('MoMAColors::Klein')
+
+
+## self-esteem by positive affect -----------------------------------
+
+ggplot(data = mca_pred_esteem,
+       aes(x = esteem_avg)) +
+  geom_density(aes(fill = positive_affect_bin), alpha = .7) +
+  theme_classic() +
+  theme(text = element_text(family = 'serif')) +
+  scale_fill_paletteer_d('MoMAColors::Klein')
+
+## self-esteem by negative affect ---------------------------------
+
+ggplot(data = mca_pred_esteem,
+       aes(x = esteem_avg)) +
+  geom_density(aes(fill = negative_affect_bin), alpha = .7) +
+  theme_classic() +
+  theme(text = element_text(family = 'serif')) +
+  scale_fill_paletteer_d('MoMAColors::Klein')
+
+## self-esteem by relative understanding -----------------------------
+
+ggplot(data = mca_pred_esteem,
+       aes(x = esteem_avg)) +
+  geom_density(aes(fill = rel_understanding_bin), alpha = .7) +
+  theme_classic() +
+  theme(text = element_text(family = 'serif')) +
+  scale_fill_paletteer_d('MoMAColors::Klein')
+
+## self-esteem by gender -----------------------------------
+
+ggplot(data = mca_pred_esteem,
+       aes(x = esteem_avg)) +
+  geom_density(aes(fill = p_gender), alpha = .7) +
+  theme_classic() +
+  theme(text = element_text(family = 'serif')) +
+  scale_fill_paletteer_d('MoMAColors::Klein')
+
+## self-esteem by sexuality ---------------------------------------
+
+ggplot(data = mca_pred_esteem,
+       aes(x = esteem_avg, y = p_sexual_orientation)) +
+  geom_density_ridges(scale = 2, aes(fill = p_sexual_orientation), alpha = .7) +
+  geom_vline(aes(xintercept = mean(esteem_avg)), linetype = 'dashed') +
+  theme_classic() +
+  theme(text = element_text(family = 'serif')) +
+  scale_fill_paletteer_d('MoMAColors::Klein')
