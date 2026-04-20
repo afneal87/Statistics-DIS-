@@ -247,3 +247,7 @@ ggplot(data = mca_pred_esteem,
   theme_classic() +
   theme(text = element_text(family = 'serif')) +
   scale_color_gradient(low = '#FF4D6FFF', high = '#579EA4FF')
+
+
+
+describeBy(mca_pred_esteem$dim.4, mca_pred_esteem$rel_distance)

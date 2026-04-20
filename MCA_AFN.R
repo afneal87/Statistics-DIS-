@@ -334,6 +334,8 @@ fviz_mca_var(mca_model.3, choice = 'var', axes = c(1,2))
 fviz_mca_var(mca_model.3, choice = 'var', axes = c(3,4))
 #same variable importance as previous model
 
+fviz_mca_var(mca_model.3, choice = 'var', axes = c(1,3))
+
 #see individuals in dimensions 1 and 2
 fviz_mca_ind(mca_model.3,
              label = 'none',
@@ -343,3 +345,60 @@ fviz_mca_ind(mca_model.3,
              axes = c(1,2)) +
   scale_color_paletteer_d('MoMAColors::Klein')
 #same spread of individuals as previously 
+
+fviz_contrib(mca_model.3, choice = 'var', top = 20, axes = c(1), gradient.cols = c('blue', 'white', 'red')) 
+
+fviz_contrib(mca_model.3, choice = 'var', top = 20, axes = c(2), gradient.cols = c('blue', 'white', 'red')) 
+
+fviz_contrib(mca_model.3, choice = 'var', top = 20, axes = c(3), gradient.cols = c('blue', 'white', 'red')) 
+
+fviz_contrib(mca_model.3, choice = 'var', top = 20, axes = c(4), gradient.cols = c('blue', 'white', 'red')) 
+
+
+fviz_mca_ind(mca_model.3,
+             label = 'none',
+             habillage = 'SWLS_bin',
+             addEllipses = TRUE, ellipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(1,2)) +
+  scale_color_paletteer_d('MoMAColors::Klein') +
+  theme(text = element_text(family = 'serif'))
+
+
+fviz_mca_ind(mca_model.3,
+             label = 'none',
+             habillage = 'positive_affect_bin',
+             addEllipses = TRUE, ellipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(1,2)) +
+  scale_color_paletteer_d('MoMAColors::Klein') +
+  theme(text = element_text(family = 'serif'))
+
+
+par(mfrow=c(2,2))
+hist(mca_pred_esteem$dim.1)
+hist(mca_pred_esteem$dim.2)
+hist(mca_pred_esteem$dim.3)
+hist(mca_pred_esteem$dim.4)
+dev.off()
+
+
+ggplot(data = mca_pred_esteem,
+       aes(x = dim.1)) +
+  geom_density(aes(fill = SWLS_bin), alpha = .7)
+
+ggplot(data = mca_pred_esteem,
+       aes(x = dim.2)) +
+  geom_density(aes(fill = SWLS_bin), alpha = .7)
+
+ggplot(data = mca_pred_esteem,
+       aes(x = dim.2)) +
+  geom_density(aes(fill = positive_affect_bin), alpha = .7)
+
+ggplot(data = mca_pred_esteem,
+       aes(x = dim.2)) +
+  geom_density(aes(fill = rel_understanding_bin), alpha = .7)
+
+ggplot(data = mca_pred_esteem,
+       aes(x = dim.1)) +
+  geom_density(aes(fill = rel_understanding_bin), alpha = .7)
