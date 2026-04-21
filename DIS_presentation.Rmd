@@ -16,6 +16,9 @@ knitr::opts_chunk$set(echo = FALSE)
 source('presentation_script.R', local = knitr::knit_global())
 ```
 
+```{r packages}
+library(cowplot)
+```
 # Introduction
 
 ## Scree Plot of Dimensions 
@@ -72,6 +75,42 @@ fviz_contrib(mca_model.3,
   labs(title = '')
 ```
 
+## Relationship Qulaity Dimensions 1 and 2
+```{r}
+fviz_mca_ind(mca_model.3,
+             label = 'none',
+             habillage = 'IMS_total_bin',
+             addEllipses = TRUE, ellipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(1,2),
+             pointsize = 2.5) +
+  scale_color_paletteer_d('MoMAColors::Klein') +
+  theme(text = element_text(family = 'serif'),
+        axis.text = element_text(size = 24),
+        axis.title = element_text(size = 26),
+        plot.title = element_text(size = 30),
+        legend.position = 'none') +
+  labs(title = 'Relationship Quality')
+```
+
+## Relationship Quality Dimensions 3 and 4
+```{r}
+fviz_mca_ind(mca_model.3,
+             label = 'none',
+             habillage = 'IMS_total_bin',
+             addEllipses = TRUE, ellipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(3,4),
+             pointsize = 2.5) +
+  scale_color_paletteer_d('MoMAColors::Klein') +
+  theme(text = element_text(family = 'serif'),
+        axis.text = element_text(size = 24),
+        axis.title = element_text(size = 26),
+        plot.title = element_text(size = 30),
+        legend.position = 'none') +
+  labs(title = 'Relationship Quality')
+```
+
 ## Important Variables for Dimensions 3 and 4
 ```{r}
 fviz_mca_var(mca_model.3, choice = 'var', axes = c(3,4),
@@ -113,20 +152,3 @@ fviz_contrib(mca_model.3,
   labs(title = '')
 ```
 
-## Individual Scores Dimensions 1 and 2 
-```{r, dpi=600}
-fviz_mca_ind(mca_model.3,
-             label = 'none',
-             habillage = 'IMS_total_bin',
-             addEllipses = TRUE, ellipse.type = 'confidence',
-             ggtheme = theme_minimal(),
-             axes = c(1,2),
-             pointsize = 3) +
-  scale_color_paletteer_d('MoMAColors::Klein') +
-  theme(text = element_text(family = 'serif'),
-        axis.text = element_text(size = 24),
-        axis.title = element_text(size = 30),
-        legend.text = element_text(size = 24),
-        legend.title = element_text(size = 28)) +
-  labs(title = '')
-```
