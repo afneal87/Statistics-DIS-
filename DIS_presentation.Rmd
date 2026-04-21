@@ -1,0 +1,132 @@
+---
+title: "DIS Spring 2026"
+author: "Amy_Neal"
+date: "2026-04-21"
+output: 
+  powerpoint_presentation: 
+    fig_width: 15
+    fig_height: 10
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r source model script, include=FALSE}
+source('presentation_script.R', local = knitr::knit_global())
+```
+
+# Introduction
+
+## Scree Plot of Dimensions 
+```{r, dpi=600}
+fviz_screeplot(mca_model.3,
+               barfill = '#7E1A2FFF',
+               barcolor = 'black') +
+  theme(text = element_text(family = 'serif'),
+        axis.text = element_text(size = 28),
+        axis.title = element_text(size = 30)) +
+  labs(title = '')
+```
+
+## Important Variables Dimensions 1 and 2
+```{r, dpi=600}
+fviz_mca_var(mca_model.3, choice = 'var', axes = c(1,2),
+             font.family = 'serif', col.var = '#FF4D6FFF', col.quanti.sup = '#579EA4FF',
+             repel = TRUE,
+             labelsize = 12,
+             pointsize = 5) +
+  theme(axis.text = element_text(size = 28),
+        axis.title = element_text(size = 30),
+        plot.margin = unit(c(0,0,0,0), 'cm')) +
+  labs(title = '')
+```
+
+## Variable Importance Dimension 1
+```{r, dpi=600}
+fviz_contrib(mca_model.3, 
+             choice = 'var', 
+             top = 20, 
+             axes = c(1), 
+             fill = '#2D2651FF',
+             color = 'black') +
+  theme(text = element_text(family = 'serif'),
+        axis.text = element_text(size = 24),
+        axis.title = element_text(size = 30),
+        plot.margin = unit(c(0,0,0,3), 'cm')) +
+  labs(title = '')
+```
+
+## Variable Importance Dimension 2
+```{r, dpi=600}
+fviz_contrib(mca_model.3, 
+             choice = 'var', 
+             top = 20, 
+             axes = c(2), 
+             fill = '#2D2651FF',
+             color = 'black') +
+  theme(text = element_text(family = 'serif'),
+        axis.text = element_text(size = 24),
+        axis.title = element_text(size = 30),
+        plot.margin = unit(c(0,0,0,2), 'cm')) +
+  labs(title = '')
+```
+
+## Important Variables for Dimensions 3 and 4
+```{r}
+fviz_mca_var(mca_model.3, choice = 'var', axes = c(3,4),
+             font.family = 'serif', col.var = '#FF4D6FFF', col.quanti.sup = '#579EA4FF',
+             repel = TRUE,
+             labelsize = 12,
+             pointsize = 5) +
+  theme(axis.text = element_text(size = 28),
+        axis.title = element_text(size = 30),
+        plot.margin = unit(c(0,0,0,0), 'cm')) +
+  labs(title = '')
+```
+
+## Variable Importance Dimension 3 
+```{r, dpi=600}
+fviz_contrib(mca_model.3, 
+             choice = 'var', 
+             top = 20, 
+             axes = c(3), 
+             fill = '#2D2651FF',
+             color = 'black') +
+  theme(text = element_text(family = 'serif'),
+        axis.text = element_text(size = 24),
+        axis.title = element_text(size = 30)) +
+  labs(title = '')
+```
+
+## Variable Importance Dimension 4
+```{r, dpi=600}
+fviz_contrib(mca_model.3, 
+             choice = 'var', 
+             top = 20, 
+             axes = c(4), 
+             fill = '#2D2651FF',
+             color = 'black') +
+  theme(text = element_text(family = 'serif'),
+        axis.text = element_text(size = 24),
+        axis.title = element_text(size = 30)) +
+  labs(title = '')
+```
+
+## Individual Scores Dimensions 1 and 2 
+```{r, dpi=600}
+fviz_mca_ind(mca_model.3,
+             label = 'none',
+             habillage = 'IMS_total_bin',
+             addEllipses = TRUE, ellipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(1,2),
+             pointsize = 3) +
+  scale_color_paletteer_d('MoMAColors::Klein') +
+  theme(text = element_text(family = 'serif'),
+        axis.text = element_text(size = 24),
+        axis.title = element_text(size = 30),
+        legend.text = element_text(size = 24),
+        legend.title = element_text(size = 28)) +
+  labs(title = '')
+```
