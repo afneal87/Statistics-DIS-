@@ -16,10 +16,18 @@ knitr::opts_chunk$set(echo = FALSE)
 source('presentation_script.R', local = knitr::knit_global())
 ```
 
-```{r packages}
+```{r packages, warning=FALSE, message=FALSE}
 library(cowplot)
+library(flextable)
 ```
 # Introduction
+
+## About the Data 
+```{r}
+flextable(describe(study2_clean$esteem_avg))
+```
+
+# MCA Analysis
 
 ## Scree Plot of Dimensions 
 ```{r, dpi=600}
@@ -224,6 +232,19 @@ fviz_mca_ind(mca_model.3,
   labs(title = 'Sexual Orientation')
 ```
 
+# Generalized Linear Model
+
+## Model 
+
+$Y_i = -1.51D_1 + 0.26D_2 - 0.24D_3 - 0.35D_4$
+
+## Likelihood Ratio of Deviance 
+```{r}
+pchisq(q = glm.model.4$null.deviance - glm.model.4$deviance,
+       df = glm.model.4$df.null - glm.model.4$df.residual, 
+       lower.tail = FALSE)
+```
+
 # Supplementary Slides 
 
 ## Self-esteem by Relationship Quality 
@@ -292,6 +313,5 @@ ggplot(data = mca_pred_esteem,
         legend.text = element_text(size = 24)) +
   labs(x = 'Self-Esteem') +
   scale_fill_paletteer_d('MoMAColors::Klein', 
-                         name = 'Understanding'), 
-                         #label = c('Low','Ambivalent','High'))
+                         name = 'Understanding') 
 ```

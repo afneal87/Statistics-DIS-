@@ -7,6 +7,7 @@ library(sjlabelled) #get variable labels
 library(psych) #descriptive statistics
 library(FactoMineR) #MCA function
 library(paletteer) #color palette 'MoMAColors::Klein'
+library(caret) #training and testing sets 
 
 # Dataset  --------------------------------------------
 
@@ -123,3 +124,28 @@ mca_pred_esteem <- study2_clean %>%
 # MCA model ---------------------------------------------------
 
 mca_model.3 <- MCA(mca_pred_esteem, quanti.sup = 11, graph = FALSE)
+
+# Generalized Linear Model -------------------------------------------------------------
+
+# add MCA dimension scores to dataframe 
+mca_pred_esteem <- mca_pred_esteem %>%
+  mutate(dim.1 = mca_model.3$ind$coord[,1],
+         dim.2 = mca_model.3$ind$coord[,2],
+         dim.3 = mca_model.3$ind$coord[,3],
+         dim.4 = mca_model.3$ind$coord[,4])
+
+# split data into training and testing sets 
+
+set.seed(1234)
+train_idx <- createDataPartition(mca_pred_esteem$esteem_avg, p = 0.8, list = FALSE)
+
+glm.train <- mca_pred_esteem[train_idx,] #training data 
+glm.test <- mca_pred_esteem[-train_idx,] #testing data 
+
+# Build model 
+
+glm.model.4 <- glm(esteem_avg ~ dim.1 + dim.2 + dim.3 + dim.4,
+                   data = glm.train, 
+                   family = gaussian())
+summary(glm.model.4)
+
