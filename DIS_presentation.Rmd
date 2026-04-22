@@ -152,3 +152,70 @@ fviz_contrib(mca_model.3,
   labs(title = '')
 ```
 
+```{r}
+fviz_mca_ind(mca_model.3,
+             label = 'none',
+             habillage = 'p_trans',
+             addEllipses = TRUE, ellipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(3,4),
+             pointsize = 2.5) +
+  scale_color_paletteer_d('MoMAColors::Klein') +
+  theme(text = element_text(family = 'serif'),
+        axis.text = element_text(size = 24),
+        axis.title = element_text(size = 26),
+        plot.title = element_text(size = 30),
+        legend.position = 'none') +
+  labs(title = 'Transgender Identity')
+```
+
+```{r}
+fviz_mca_ind(mca_model.3,
+             label = 'none',
+             habillage = 'p_gender',
+             addEllipses = TRUE, ellipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(3,4),
+             pointsize = 2.5) +
+  scale_color_paletteer_d('MoMAColors::Klein') +
+  theme(text = element_text(family = 'serif'),
+        axis.text = element_text(size = 24),
+        axis.title = element_text(size = 26),
+        plot.title = element_text(size = 30),
+        legend.position = 'none') +
+  labs(title = 'Participant Gender')
+```
+
+```{r}
+fviz_mca_ind(mca_model.3,
+             label = 'none',
+             habillage = 'rel_distance',
+             addEllipses = TRUE, ellipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(3,4),
+             pointsize = 2.5) +
+  scale_color_paletteer_d('MoMAColors::Klein') +
+  theme(text = element_text(family = 'serif'),
+        axis.text = element_text(size = 24),
+        axis.title = element_text(size = 26),
+        plot.title = element_text(size = 30),
+        legend.position = 'none') +
+  labs(title = 'Relationship Long-Distance')
+```
+
+```{r}
+fviz_mca_ind(mca_model.3,
+             label = 'none',
+             habillage = 'p_sexual_orientation',
+             addEllipses = TRUE, ellipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(3,4),
+             pointsize = 2.5) +
+  scale_color_paletteer_d('MoMAColors::Klein') +
+  theme(text = element_text(family = 'serif'),
+        axis.text = element_text(size = 24),
+        axis.title = element_text(size = 26),
+        plot.title = element_text(size = 30),
+        legend.position = 'none') +
+  labs(title = 'Sexual Orientation')
+```
