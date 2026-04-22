@@ -152,6 +152,7 @@ fviz_contrib(mca_model.3,
   labs(title = '')
 ```
 
+## Individuals on Dimensions 3 and 4
 ```{r}
 fviz_mca_ind(mca_model.3,
              label = 'none',
@@ -169,6 +170,7 @@ fviz_mca_ind(mca_model.3,
   labs(title = 'Transgender Identity')
 ```
 
+## Gender and Dimensions 3 and 4 
 ```{r}
 fviz_mca_ind(mca_model.3,
              label = 'none',
@@ -186,6 +188,7 @@ fviz_mca_ind(mca_model.3,
   labs(title = 'Participant Gender')
 ```
 
+## Relationship long distance and dimensions 3 and 4 
 ```{r}
 fviz_mca_ind(mca_model.3,
              label = 'none',
@@ -203,6 +206,7 @@ fviz_mca_ind(mca_model.3,
   labs(title = 'Relationship Long-Distance')
 ```
 
+## Sexual orientation and dimensions 3 and 4 
 ```{r}
 fviz_mca_ind(mca_model.3,
              label = 'none',
@@ -218,4 +222,76 @@ fviz_mca_ind(mca_model.3,
         plot.title = element_text(size = 30),
         legend.position = 'none') +
   labs(title = 'Sexual Orientation')
+```
+
+# Supplementary Slides 
+
+## Self-esteem by Relationship Quality 
+```{r, dpi=300}
+ggplot(data = mca_pred_esteem,
+       aes(x = esteem_avg)) +
+  geom_density(aes(fill = IMS_total_bin), alpha = .7) +
+  geom_vline(aes(xintercept = mean(esteem_avg)), linetype = 'dashed') +
+  theme_classic() +
+  theme(text = element_text(family = 'serif'),
+        axis.text = element_text(size = 24),
+        axis.title = element_text(size = 28),
+        legend.title = element_text(size = 28),
+        legend.text = element_text(size = 24)) +
+  labs(x = 'Self-Esteem') +
+  scale_fill_paletteer_d('MoMAColors::Klein', name = 'Relationship Quality', label = c('Low','Ambivalent','High'))
+```
+
+## Self-esteem by Relative Understanding 
+```{r}
+ggplot(data = mca_pred_esteem,
+       aes(x = esteem_avg)) +
+  geom_density(aes(fill = rel_understanding_bin), alpha = .7) +
+  geom_vline(aes(xintercept = mean(esteem_avg)), linetype = 'dashed') +
+  theme_classic() +
+  theme(text = element_text(family = 'serif'),
+        axis.text = element_text(size = 24),
+        axis.title = element_text(size = 28),
+        legend.title = element_text(size = 28),
+        legend.text = element_text(size = 24)) +
+  labs(x = 'Self-Esteem') +
+  scale_fill_paletteer_d('MoMAColors::Klein', 
+                         name = 'Understanding', 
+                         label = c('Low','Ambivalent','High'))
+```
+
+## Self-esteem by SWLS
+```{r}
+ggplot(data = mca_pred_esteem,
+       aes(x = esteem_avg)) +
+  geom_density(aes(fill = SWLS_bin), alpha = .7) +
+  geom_vline(aes(xintercept = mean(esteem_avg)), linetype = 'dashed') +
+  theme_classic() +
+  theme(text = element_text(family = 'serif'),
+        axis.text = element_text(size = 24),
+        axis.title = element_text(size = 28),
+        legend.title = element_text(size = 28),
+        legend.text = element_text(size = 24)) +
+  labs(x = 'Self-Esteem') +
+  scale_fill_paletteer_d('MoMAColors::Klein', 
+                         name = 'Well-Being', 
+                         label = c('Low','Middle','High'))
+```
+
+## Self-esteem by Gender 
+```{r}
+ggplot(data = mca_pred_esteem,
+       aes(x = esteem_avg)) +
+  geom_density(aes(fill = p_gender), alpha = .7) +
+  geom_vline(aes(xintercept = mean(esteem_avg)), linetype = 'dashed') +
+  theme_classic() +
+  theme(text = element_text(family = 'serif'),
+        axis.text = element_text(size = 24),
+        axis.title = element_text(size = 28),
+        legend.title = element_text(size = 28),
+        legend.text = element_text(size = 24)) +
+  labs(x = 'Self-Esteem') +
+  scale_fill_paletteer_d('MoMAColors::Klein', 
+                         name = 'Understanding'), 
+                         #label = c('Low','Ambivalent','High'))
 ```
