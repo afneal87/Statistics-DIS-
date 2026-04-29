@@ -19,13 +19,9 @@ source('presentation_script.R', local = knitr::knit_global())
 ```{r packages, warning=FALSE, message=FALSE}
 library(cowplot)
 library(flextable)
+library(gtsummary)
 ```
 # Introduction
-
-## About the Data 
-```{r}
-flextable(describe(study2_clean$esteem_avg))
-```
 
 # MCA Analysis
 
