@@ -149,3 +149,16 @@ glm.model.4 <- glm(esteem_avg ~ dim.1 + dim.2 + dim.3 + dim.4,
                    family = gaussian())
 summary(glm.model.4)
 
+
+ggplot(data.frame(x = c(-4, 4)), aes(x)) +
+  stat_function(fun = dnorm,
+                args = list(mean = 0, sd = 1),
+                color = '#BD777AFF',
+                linewidth = 2) +
+  theme_classic() +
+  theme(text = element_text(family = 'serif'),
+        plot.title = element_text(size = 26)) +
+  labs(title = 'Gaussian Distribution')
+ggsave(filename = 'standard_normal.tiff', dpi = 600)
+
+tbl_regression(glm.model.4)

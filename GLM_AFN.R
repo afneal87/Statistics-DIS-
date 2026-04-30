@@ -108,6 +108,10 @@ glm.model.4 <- glm(esteem_avg ~ dim.1 + dim.2 + dim.3 + dim.4,
                    family = gaussian())
 summary(glm.model.4)
 
+pchisq(q = 1017.34-576.89,
+       df = 726-722,
+       lower.tail = FALSE)
+
 # test whether this model is significant improvement over previous model
 pchisq(q = 588.2 - 576.89,
        df = 723 - 722,
