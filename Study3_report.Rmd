@@ -1,0 +1,264 @@
+---
+title: "Study 3 Analyses"
+author: "AFN"
+date: "2026-06-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+source('Study3_analyses.R', local = knitr::knit_global())
+```
+
+# Exploratory Data Analyses 
+
+## Participant Gender 
+
+```{r}
+table(study3_mca$p_gender)
+```
+
+```{r}
+plot(study3_mca$p_gender)
+```
+
+## Participant Age
+
+```{r}
+describe(study3_mca$p_age)
+```
+
+```{r}
+hist(study3_mca$p_age)
+```
+
+```{r}
+boxplot(study3_mca$p_age)
+```
+
+## Participant Sexual Orientation
+
+```{r}
+table(study3_mca$p_sexual_orientation)
+```
+
+```{r}
+plot(study3_mca$p_sexual_orientation)
+```
+
+## Participant Socioeconomic Status 
+
+```{r}
+table(study3_mca$p_SES)
+```
+
+```{r}
+hist(study3_mca$p_SES)
+```
+
+## Investment Model Scale Averages
+
+```{r}
+describe(select(study3_mca, IMS_sat_avg, IMS_com_avg, IMS_alt_avg, IMS_inv_avg))
+```
+
+```{r}
+hist(study3_mca$IMS_sat_avg)
+```
+
+```{r}
+hist(study3_mca$IMS_com_avg)
+```
+
+```{r}
+hist(study3_mca$IMS_alt_avg)
+```
+
+```{r}
+hist(study3_mca$IMS_inv_avg)
+```
+
+## Self-esteem
+
+```{r}
+describe(study3_mca$SelfEsteem_avg)
+```
+
+```{r}
+hist(study3_mca$SelfEsteem_avg)
+```
+
+## Satisfaction with Life 
+
+```{r}
+describe(study3_mca$SWLS_avg)
+```
+
+```{r}
+hist(study3_mca$SWLS_avg)
+```
+
+```{r}
+boxplot(study3$SWLS_avg)
+```
+
+## Active and Passive Social Media Use 
+
+```{r}
+describe(select(study3_mca, SMS_active_passive_1, SMS_active_passive_2))
+```
+
+```{r}
+hist(study3_mca$SMS_active_passive_1)
+```
+
+```{r}
+hist(study3_mca$SMS_active_passive_2)
+```
+
+## Online Relationship Visibility
+
+```{r}
+describe(study3_mca$relation_visibility)
+```
+
+```{r}
+hist(study3_mca$relation_visibility)
+```
+
+# MCA Analysis 
+
+```{r}
+fviz_screeplot(s3_mca)
+```
+
+```{r}
+summary(s3_mca, nbelements = Inf)
+```
+
+## Dimension 1
+
+```{r}
+fviz_contrib(s3_mca, choice = 'var', top = 20, axes = 1)
+```
+
+## Dimension 2
+
+```{r}
+fviz_contrib(s3_mca, choice = 'var', top = 20, axes = 2)
+```
+
+## Dimensions 1 and 2
+
+Important variables on both dimensions 
+
+```{r}
+fviz_mca_ind(s3_mca, 
+             label = 'none',
+             habillage = 'IMS_sat_bin',
+             addEllipses = TRUE, elipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(1,2))
+```
+
+Relationship Satisfaction 
+
+```{r}
+fviz_mca_ind(s3_mca, 
+             label = 'none',
+             habillage = 'IMS_sat_bin',
+             addEllipses = TRUE, elipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(1,2))
+```
+
+Relationship Commitment
+
+```{r}
+fviz_mca_ind(s3_mca, 
+             label = 'none',
+             habillage = 'IMS_com_bin',
+             addEllipses = TRUE, elipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(1,2))
+```
+
+Quality of Alternatives 
+
+```{r}
+fviz_mca_ind(s3_mca, 
+             label = 'none',
+             habillage = 'IMS_alt_bin',
+             addEllipses = TRUE, elipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(1,2))
+```
+
+Relationship Investment 
+
+```{r}
+fviz_mca_ind(s3_mca, 
+             label = 'none',
+             habillage = 'IMS_inv_bin',
+             addEllipses = TRUE, elipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(1,2))
+```
+
+Satisfaction with Life 
+
+```{r}
+fviz_mca_ind(s3_mca, 
+             label = 'none',
+             habillage = 'SWLS_bin',
+             addEllipses = TRUE, elipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(1,2))
+```
+
+## Dimension 3
+
+```{r}
+fviz_contrib(s3_mca, choice = 'var', top = 20, axes = 3)
+```
+
+## Dimension 4
+
+```{r}
+fviz_contrib(s3_mca, choice = 'var', top = 20, axes = 4)
+```
+
+## Dimensions 3 and 4
+
+Variable importance for both dimensions 
+
+```{r}
+fviz_mca_var(s3_mca, choice = 'var', axes = c(3,4))
+```
+
+Active social media use 
+
+```{r}
+fviz_mca_ind(s3_mca, 
+             label = 'none',
+             habillage = 'SMS_active_passive_1',
+             addEllipses = TRUE, elipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(3,4))
+```
+
+Passive social media use 
+
+```{r}
+fviz_mca_ind(s3_mca, 
+             label = 'none',
+             habillage = 'SMS_active_passive_2',
+             addEllipses = TRUE, elipse.type = 'confidence',
+             ggtheme = theme_minimal(),
+             axes = c(3,4))
+```
+
+
