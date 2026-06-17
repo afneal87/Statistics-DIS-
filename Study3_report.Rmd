@@ -2,14 +2,18 @@
 title: "Study 3 Analyses"
 author: "AFN"
 date: "2026-06-16"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r, include=FALSE}
 source('Study3_analyses.R', local = knitr::knit_global())
 ```
 
